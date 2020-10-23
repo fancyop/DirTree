@@ -4,14 +4,16 @@
 
 #pragma comment (lib, "User32.lib")
 
-std::vector<bool> lastPathRecoder;
-
 using namespace std;
 
+//树形分隔结构
 #define midSymbol (L"├");
 #define lineSymbol (L"│");
 #define angleSymbol (L"└");
 #define spaceSymbol (L" ");
+
+//记录所有上级目录是否为所在目录的最后一项，用于结构化路径首段的树形分隔，如："├"  "│"  "└"
+std::vector<bool> lastPathRecoder;
 
 /*
 ├ aclocal.m4
@@ -61,8 +63,7 @@ DWORD ListAllFileInDirectory(LPWSTR szPath, DirTree* dir)
     {
         do {
             // 过滤"."和".."，不需要遍历
-            if (lstrcmp(FindFileData.cFileName, TEXT(".")) == 0 ||
-                lstrcmp(FindFileData.cFileName, TEXT("..")) == 0)
+            if (lstrcmp(FindFileData.cFileName, TEXT(".")) == 0 || lstrcmp(FindFileData.cFileName, TEXT("..")) == 0)
             {
                 continue;
             }
@@ -101,31 +102,37 @@ void raversalTree(DirTree* dir)
     int depth = dir->depth;
 
     int len = 0;
-    if (pInfo->nodeList.size() == pInfo->pathList.size()) {
+    if (pInfo->nodeList.size() == pInfo->pathList.size()) 
+    {
         len = pInfo->nodeList.size();
     }
     
     //wcout << "lastPathRecoder: " << lastPathRecoder.size() << endl;
     //wcout << "depth: " << depth << endl;
 
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++)
+    {
         wstring wsDisplay;
 
         for (int i = 0; i < depth; i++)
         {
-            if (false == lastPathRecoder.at((size_t)i+1)) {
+            if (false == lastPathRecoder.at((size_t)i+1)) 
+            {
                 wsDisplay += lineSymbol;
             }
-            else{
+            else
+            {
                 wsDisplay += spaceSymbol;
             }
             wsDisplay += spaceSymbol;
         }
 
-        if (i == len - 1) {
+        if (i == len - 1) 
+        {
             wsDisplay += angleSymbol;
         }
-        else {
+        else 
+        {
             wsDisplay += midSymbol;
         }
         wsDisplay += spaceSymbol;
@@ -133,17 +140,21 @@ void raversalTree(DirTree* dir)
         wsDisplay += pInfo->pathList.at(i);
         wcout << wsDisplay << endl;
 
-        if (pInfo->nodeList.at(i) != NULL) {
-            if (i == len - 1) {
+        if (pInfo->nodeList.at(i) != NULL) 
+        {
+            if (i == len - 1) 
+            {
                 lastPathRecoder.push_back(true);
             }
-            else {
+            else 
+            {
                 lastPathRecoder.push_back(false);
             }
             raversalTree(pInfo->nodeList.at(i));
         }
-        else {
-            
+        else 
+        {
+            ;
         }
     }
     lastPathRecoder.pop_back();
@@ -166,9 +177,12 @@ int main()
     WCHAR szCurrentPath[MAX_PATH];
     GetCurrentDirectory(MAX_PATH, szCurrentPath);
 
-    //wstring s(L"C:\\Users");
-    //ListAllFileInDirectory(LPWSTR(s.c_str()), &tree);
+#if 0
+    wstring s(L"C:\\Users");
+    ListAllFileInDirectory(LPWSTR(s.c_str()), &tree);
+#else
     ListAllFileInDirectory(szCurrentPath, &tree);
+#endif
 
     raversal(&tree);
 
